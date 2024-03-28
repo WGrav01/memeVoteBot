@@ -1,5 +1,4 @@
 import os
-from dotenv import load_dotenv
 import ast
 import discord
 from discord.ext import tasks
@@ -11,7 +10,6 @@ intents = discord.Intents.default()
 intents.message_content = True
 intents.reactions = True
 
-load_dotenv()
 bot = discord.AutoShardedBot(intents=intents)
 
 
@@ -874,4 +872,4 @@ async def change_status():
     )
 
 
-bot.run(os.getenv("TOKEN"))
+bot.run(os.environ.get('TOKEN'))
