@@ -1,5 +1,5 @@
 # Use a PyPy base image
-FROM pypy:3.10-bookworm
+FROM --platform=linux/arm64/v8 pypy:3.10-bookworm
 
 # Set the working directory
 WORKDIR /usr/src/app
