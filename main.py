@@ -642,6 +642,9 @@ async def on_message(message):
     elif isinstance(memechannels, list):
         if message.channel.id not in memechannels:
             return
+    else:
+        if message.channel.id != int(memechannels):
+            return
 
     if message.attachments:
         for attachment in message.attachments:
