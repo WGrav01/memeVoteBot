@@ -48,9 +48,9 @@ async def addMemeChannel(ctx, channel: discord.abc.GuildChannel):
     await ctx.defer(ephemeral=True)
     if ctx.user.guild_permissions.administrator:
 
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        db_path = os.path.join(script_dir, "memevotebot.sqlite")
+        db_path = "/data/memevotebot.sqlite"
         db = await aiosqlite.connect(db_path)
+
 
         key = f"{ctx.guild.id} memeChannels"
         query = "SELECT * FROM serverSettings WHERE guild_id = :guild_id;"
@@ -129,9 +129,9 @@ async def addMemeChannel(ctx, channel: discord.abc.GuildChannel):
 async def removeMemeChannel(ctx, channel: discord.abc.GuildChannel):
     await ctx.defer(ephemeral=True)
 
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    db_path = os.path.join(script_dir, "memevotebot.sqlite")
+    db_path = "/data/memevotebot.sqlite"
     db = await aiosqlite.connect(db_path)
+
 
     query = "SELECT * FROM serverSettings WHERE guild_id = :guild_id;"
     values = {"guild_id": ctx.guild.id}
@@ -215,8 +215,7 @@ async def viewSettings(ctx):
     await ctx.defer(ephemeral=True)
     if ctx.user.guild_permissions.administrator:
         try:
-            script_dir = os.path.dirname(os.path.abspath(__file__))
-            db_path = os.path.join(script_dir, "memevotebot.sqlite")
+            db_path = "/data/memevotebot.sqlite"
             db = await aiosqlite.connect(db_path)
 
             embed = discord.Embed(
@@ -331,8 +330,7 @@ async def addShowcaseChannel(ctx, channel: discord.abc.GuildChannel):
     await ctx.defer(ephemeral=True)
     if ctx.user.guild_permissions.administrator:
 
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        db_path = os.path.join(script_dir, "memevotebot.sqlite")
+        db_path = "/data/memevotebot.sqlite"
         db = await aiosqlite.connect(db_path)
 
         query = "SELECT * FROM ServerSettings WHERE guild_id = :guild_id"
@@ -389,8 +387,7 @@ async def removeShowcaseChannel(ctx, channel: discord.abc.GuildChannel):
     await ctx.defer(ephemeral=True)
     if ctx.user.guild_permissions.administrator:
 
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        db_path = os.path.join(script_dir, "memevotebot.sqlite")
+        db_path = "/data/memevotebot.sqlite"
         db = await aiosqlite.connect(db_path)
 
         query = "SELECT showcaseChannel FROM serverSettings WHERE guild_id = :guild_id;"
@@ -447,8 +444,7 @@ async def setShowcaseLikes(ctx, likes: int):
     await ctx.defer(ephemeral=True)
     if ctx.user.guild_permissions.administrator:
 
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        db_path = os.path.join(script_dir, "memevotebot.sqlite")
+        db_path = "/data/memevotebot.sqlite"
         db = await aiosqlite.connect(db_path)
 
         query = "SELECT * FROM ServerSettings WHERE guild_id = :guild_id"
@@ -503,8 +499,7 @@ async def setDeleteDislikes(ctx, dislikes: int):
     await ctx.defer(ephemeral=True)
     if ctx.user.guild_permissions.administrator:
 
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        db_path = os.path.join(script_dir, "memevotebot.sqlite")
+        db_path = "/data/memevotebot.sqlite"
         db = await aiosqlite.connect(db_path)
 
         query = "SELECT * FROM ServerSettings WHERE guild_id = :guild_id;"
@@ -560,8 +555,7 @@ async def setDeleteReuploads(ctx, dislikes: int):
     await ctx.defer(ephemeral=True)
     if ctx.user.guild_permissions.administrator:
 
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        db_path = os.path.join(script_dir, "memevotebot.sqlite")
+        db_path = "/data/memevotebot.sqlite"
         db = await aiosqlite.connect(db_path)
 
         query = "SELECT * FROM ServerSettings WHERE guild_id = :guild_id;"
@@ -632,8 +626,7 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    db_path = os.path.join(script_dir, "memevotebot.sqlite")
+    db_path = "/data/memevotebot.sqlite"
     db = await aiosqlite.connect(db_path)
 
     query = "SELECT * FROM ServerSettings WHERE guild_id = :guild_id;"
@@ -695,8 +688,8 @@ async def on_message(message):
 @bot.event
 async def on_raw_reaction_add(payload):
     if payload.user_id != bot.user.id:
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        db_path = os.path.join(script_dir, "memevotebot.sqlite")
+        
+        db_path = "/data/memevotebot.sqlite"
         db = await aiosqlite.connect(db_path)
 
         query = "SELECT * FROM ServerSettings WHERE guild_id = :guild_id;"
@@ -848,8 +841,7 @@ async def on_raw_reaction_add(payload):
 async def on_raw_message_delete(payload):
     try:
 
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        db_path = os.path.join(script_dir, "memevotebot.sqlite")
+        db_path = "/data/memevotebot.sqlite"
         db = await aiosqlite.connect(db_path)
 
         query = "DELETE FROM Messages WHERE message_id = :message_id;"
