@@ -31,9 +31,8 @@ async def on_ready():
              showcaseLikes INT,
              deleteDislikes INT);"""
 
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    db_path = os.path.join(script_dir, "memevotebot.sqlite")
-    db = await aiosqlite.connect(db_path)
+        db_path = "/data/memevotebot.sqlite"
+        db = await aiosqlite.connect(db_path)
 
     await db.execute(db_init_query)
     await db.execute(db_init_query2)
