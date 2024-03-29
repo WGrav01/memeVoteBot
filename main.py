@@ -632,18 +632,16 @@ async def on_message(message):
     values = {"guild_id": message.guild.id}
     try:
         result = await db.execute_fetchall(query, values)
-        memechannels = result[0][1]
+        memechannels = result[0]
     except IndexError:
         return
 
     if isinstance(memechannels, int):
         if message.channel.id != memechannels:
             return
-    elif isinstance(memechannels, list):
+    elif isinstance(memechannels, str):
+        memechannels = ast.literal_eval(memechannels)
         if message.channel.id not in memechannels:
-            return
-    else:
-        if message.channel.id != int(memechannels):
             return
 
     if message.attachments:
