@@ -632,7 +632,7 @@ async def on_message(message):
     values = {"guild_id": message.guild.id}
     try:
         result = await db.execute_fetchall(query, values)
-        memechannels = ast.literal_eval(result[0])
+        memechannels = ast.literal_eval(result[0][1])
         print(f"{memechannels}, type: {type(memechannels)}")
     except IndexError:
         return
