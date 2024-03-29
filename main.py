@@ -641,7 +641,6 @@ async def on_message(message):
         if message.channel.id != memechannels:
             return
     elif isinstance(memechannels, list):
-        memechannels = ast.literal_eval(memechannels)
         if message.channel.id not in memechannels:
             return
 
