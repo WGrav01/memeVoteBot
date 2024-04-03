@@ -773,13 +773,13 @@ async def on_raw_reaction_add(payload):
                     )
 
                     # Send a new message with the attachment
-                    showcased_meme =await showcasechannel.send(embed=embed, file=attachment)
+                    showcased_meme = await showcasechannel.send(embed=embed, file=attachment)
                     query = "UPDATE Messages SET in_showcase = :in_showcase WHERE message_id = :message_id;"
                     values = {"in_showcase": showcased_meme.id}
                     await db.execute(query, values)
                     await db.commit()
                     await db.close()
-                elif num_thumbs_up < showcaselikes and result[0][5] != 0:
+                elif num_thumbs_up >= showcaselikes and result[0][5] != 0:
                     channel = bot.get_channel(showcasechannel_id)
                     message = await channel.fetch_message(result[0][5])
                     file = await message.attachments[0].to_file()
