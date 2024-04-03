@@ -50,7 +50,6 @@ async def addMemeChannel(ctx, channel: discord.abc.GuildChannel):
         db_path = "/data/memevotebot.sqlite"
         db = await aiosqlite.connect(db_path)
 
-
         key = f"{ctx.guild.id} memeChannels"
         query = "SELECT * FROM serverSettings WHERE guild_id = :guild_id;"
         values = {"guild_id": ctx.guild.id}
@@ -130,7 +129,6 @@ async def removeMemeChannel(ctx, channel: discord.abc.GuildChannel):
 
     db_path = "/data/memevotebot.sqlite"
     db = await aiosqlite.connect(db_path)
-
 
     query = "SELECT * FROM serverSettings WHERE guild_id = :guild_id;"
     values = {"guild_id": ctx.guild.id}
@@ -688,7 +686,7 @@ async def on_message(message):
 @bot.event
 async def on_raw_reaction_add(payload):
     if payload.user_id != bot.user.id:
-        
+
         db_path = "/data/memevotebot.sqlite"
         db = await aiosqlite.connect(db_path)
 
@@ -749,12 +747,12 @@ async def on_raw_reaction_add(payload):
                 settings = await db.execute_fetchall(query, values)
                 showcaselikes = settings[0][4]
                 showcasechannel_id = settings[0][2]
-                if num_thumbs_up >= showcaselikes and not result[0][5] == 1:
+                if num_thumbs_up >= showcaselikes and result[0][5] == 0:
                     showcasechannel = bot.get_channel(showcasechannel_id)
-                    attachment = message.attachments[0]
+                    attachment = message.attachments
 
                     # Download the attachment
-                    attachment = await attachment.to_file()
+                    attachment = await attachment[0].to_file()
 
                     author = message.author
                     embed = discord.Embed(
@@ -777,10 +775,37 @@ async def on_raw_reaction_add(payload):
                     # Send a new message with the attachment
                     await showcasechannel.send(embed=embed, file=attachment)
                     query = "UPDATE Messages SET in_showcase = :in_showcase WHERE message_id = :message_id;"
-                    values = {"in_showcase": 1}
+                    values = {"in_showcase": payload.message_id}
                     await db.execute(query, values)
                     await db.commit()
                     await db.close()
+                elif num_thumbs_up < showcaselikes and result[0][5] != 0:
+                    channel = bot.get_channel(showcasechannel_id)
+                    message = await channel.fetch_message(result[0][5])
+                    file = await message.attachments[0].to_file()
+
+                    author = message.author
+                    embed = discord.Embed(
+                        title="Meme",
+                        description=str(message.content),
+                        color=discord.Color.gold(),
+                    )
+                    embed.set_author(
+                        name=str(author.name), icon_url=str(message.author.avatar.url)
+                    )
+                    embed.add_field(name="Channel", value=str(message.channel.mention))
+                    embed.add_field(name="Likes", value=f"{num_thumbs_up} 👍")
+                    embed.add_field(name="Link to message", value=str(message.jump_url))
+                    utc_timezone = pytz.utc
+                    utc_created_at = message.created_at.astimezone(utc_timezone)
+                    embed.set_footer(
+                        text=f"Sent at {utc_created_at.strftime('%m/%d/%Y %I:%M %p')} (UTC)"
+                    )
+
+                    await message.edit(embed=embed, file=file)
+
+                    await db.close()
+                    return
 
             except (IndexError, TypeError):
                 pass
@@ -864,4 +889,4 @@ async def change_status():
     )
 
 
-bot.run(os.environ.get('TOKEN'))
+bot.run(os.environ.get("TOKEN"))
