@@ -773,9 +773,9 @@ async def on_raw_reaction_add(payload):
                     )
 
                     # Send a new message with the attachment
-                    await showcasechannel.send(embed=embed, file=attachment)
+                    showcased_meme =await showcasechannel.send(embed=embed, file=attachment)
                     query = "UPDATE Messages SET in_showcase = :in_showcase WHERE message_id = :message_id;"
-                    values = {"in_showcase": payload.message_id}
+                    values = {"in_showcase": showcased_meme.id}
                     await db.execute(query, values)
                     await db.commit()
                     await db.close()
