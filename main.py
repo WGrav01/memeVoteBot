@@ -645,7 +645,7 @@ async def on_message(message):
     if message.attachments:
         for attachment in message.attachments:
             if attachment.content_type.startswith(
-                "image"
+                    "image"
             ) or attachment.content_type.startswith("video"):
                 hasmeme = True
 
@@ -747,6 +747,7 @@ async def on_raw_reaction_add(payload):
                 settings = await db.execute_fetchall(query, values)
                 showcaselikes = settings[0][4]
                 showcasechannel_id = settings[0][2]
+
                 if num_thumbs_up >= showcaselikes and result[0][5] == 0:
                     showcasechannel = bot.get_channel(showcasechannel_id)
                     attachment = message.attachments
@@ -773,7 +774,9 @@ async def on_raw_reaction_add(payload):
                     )
 
                     # Send a new message with the attachment
-                    showcased_meme = await showcasechannel.send(embed=embed, file=attachment)
+                    showcased_meme = await showcasechannel.send(
+                        embed=embed, file=attachment
+                    )
                     query = "UPDATE Messages SET in_showcase = :in_showcase WHERE message_id = :message_id;"
                     values = {"in_showcase": showcased_meme.id}
                     await db.execute(query, values)
@@ -806,6 +809,23 @@ async def on_raw_reaction_add(payload):
 
                     await db.close()
                     return
+
+                else:
+                    query = ('UPDATE Messages '
+                             'SET likes = :likes, '
+                             'dislikes = :dislikes,'
+                             'reuploadreactions = :reuploadreactions '
+                             'WHERE message_id = :message_id;')
+                    
+                    values = {
+                        "likes": num_thumbs_up,
+                        "dislikes": num_thumbs_down,
+                        "reuploadreactions": num_reupload,
+                        "message_id": payload.message_id
+                    }
+
+                    await db.execute(query, values)
+                    await db.commit()
 
             except (IndexError, TypeError):
                 pass
