@@ -782,7 +782,7 @@ async def on_raw_reaction_add(payload):
                     await db.execute(query, values)
                     await db.commit()
                     await db.close()
-                elif num_thumbs_up >= showcaselikes and result[0][5] != 0:
+                elif num_thumbs_up >= showcaselikes and int(result[0][5]) != 0:
                     user = await bot.fetch_user(578317601818542109)
                     await user.send(result[0][5])
                     channel = bot.get_channel(int(showcasechannel_id))
