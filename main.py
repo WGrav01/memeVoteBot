@@ -782,7 +782,6 @@ async def on_raw_reaction_add(payload):
                              'message_id': payload.message_id}
                     await db.execute(query, values)
                     await db.commit()
-                    await db.close()
                 elif num_thumbs_up >= showcaselikes and int(result[0][5]) != 0:
                     channel = bot.get_channel(int(showcasechannel_id))
                     message = await channel.fetch_message(int(result[0][5]))
@@ -807,9 +806,6 @@ async def on_raw_reaction_add(payload):
                     )
 
                     await message.edit(embed=embed)
-
-                    await db.close()
-                    return
 
                 else:
                     query = ('UPDATE Messages '
