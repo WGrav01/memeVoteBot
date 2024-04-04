@@ -748,7 +748,7 @@ async def on_raw_reaction_add(payload):
                 showcaselikes = settings[0][4]
                 showcasechannel_id = settings[0][2]
 
-                if num_thumbs_up >= showcaselikes and result[0][5] == 0:
+                if num_thumbs_up >= showcaselikes and int(result[0][5]) == 0:
                     showcasechannel = bot.get_channel(showcasechannel_id)
                     attachment = message.attachments
 
