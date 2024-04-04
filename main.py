@@ -778,7 +778,8 @@ async def on_raw_reaction_add(payload):
                         embed=embed, file=attachment
                     )
                     query = "UPDATE Messages SET in_showcase = :in_showcase WHERE message_id = :message_id;"
-                    values = {"in_showcase": showcased_meme.id}
+                    values = {"in_showcase": showcased_meme.id, 
+                             'message_id': payload.message_id}
                     await db.execute(query, values)
                     await db.commit()
                     await db.close()
