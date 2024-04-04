@@ -783,8 +783,8 @@ async def on_raw_reaction_add(payload):
                     await db.commit()
                     await db.close()
                 elif num_thumbs_up >= showcaselikes and result[0][5] != 0:
-                    channel = bot.get_channel(showcasechannel_id)
-                    message = await channel.fetch_message(result[0][5])
+                    channel = bot.get_channel(int(showcasechannel_id))
+                    message = await channel.fetch_message(int(result[0][5]))
                     file = await message.attachments[0].to_file()
 
                     author = message.author
