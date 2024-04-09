@@ -784,7 +784,7 @@ async def on_raw_reaction_add(payload):
                     await db.commit()
                 elif num_thumbs_up >= showcaselikes and int(result[0][5]) != 0:
                     channel = bot.get_channel(int(showcasechannel_id))
-                    message = await channel.fetch_message(int(result[0][5]))
+                    showcase_message = await channel.fetch_message(int(result[0][5]))
                     file = await message.attachments[0].to_file()
 
                     author = message.author
@@ -805,7 +805,7 @@ async def on_raw_reaction_add(payload):
                         text=f"Sent at {utc_created_at.strftime('%m/%d/%Y %I:%M %p')} (UTC)"
                     )
 
-                    await message.edit(embed=embed)
+                    await showcase_message.edit(embed=embed)
 
                 else:
                     query = ('UPDATE Messages '
