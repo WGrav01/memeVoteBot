@@ -749,11 +749,12 @@ async def on_raw_reaction_add(payload):
                 showcasechannel_id = settings[0][2]
 
                 if num_thumbs_up >= showcaselikes and int(result[0][5]) == 0:
-                    showcasechannel = bot.get_channel(showcasechannel_id)
+                    showcasechannel = bot.fetch_channel(showcasechannel_id)
                     attachment = message.attachments
+                    channel = bot.fetch_channel(payload.channel_id)
 
                     # Download the attachment
-                    if "offensive" in payload.channel_name:
+                    if "offensive" in channel.name:
                         attachment[0].filename = f'SPOILER_{attachment[0].filename}'
                         
                     attachment = await attachment[0].to_file()
