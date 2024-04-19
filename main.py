@@ -753,6 +753,9 @@ async def on_raw_reaction_add(payload):
                     attachment = message.attachments
 
                     # Download the attachment
+                    if "offensive" in payload.channel_name:
+                        attachment[0].filename = f'SPOILER_{attachment[0].filename}'
+                        
                     attachment = await attachment[0].to_file()
 
                     author = message.author
