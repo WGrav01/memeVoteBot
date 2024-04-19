@@ -749,9 +749,9 @@ async def on_raw_reaction_add(payload):
                 showcasechannel_id = settings[0][2]
 
                 if num_thumbs_up >= showcaselikes and int(result[0][5]) == 0:
-                    showcasechannel = bot.fetch_channel(showcasechannel_id)
+                    showcasechannel = await bot.fetch_channel(showcasechannel_id)
                     attachment = message.attachments
-                    channel = bot.fetch_channel(payload.channel_id)
+                    channel = await bot.fetch_channel(payload.channel_id)
 
                     # Download the attachment
                     if "offensive" in channel.name:
