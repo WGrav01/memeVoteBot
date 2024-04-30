@@ -716,7 +716,13 @@ async def on_raw_reaction_add(payload):
             for reaction in message.reactions:
                 # Check if the reaction's emoji matches the ones you're interested in
                 if str(reaction.emoji) == "👍":
-                    num_thumbs_up = reaction.count
+                    # Delete the reaction if it is by the author of the post
+                    user = await bot.fetch_user(payload.user_id)
+                    post = await channel.fetch_message(payload.message_id)
+                    if user.id == post.author.id:
+                        await reaction.remove(user)
+                    else:
+                        num_thumbs_up = reaction.count
                 elif str(reaction.emoji) == "👎":
                     num_thumbs_down = reaction.count
                 elif str(reaction.emoji) == "♻️":
@@ -756,12 +762,15 @@ async def on_raw_reaction_add(payload):
                     # Download the attachment
                     if "offensive" in channel.name:
                         attachment[0].filename = f'SPOILER_{attachment[0].filename}'
-                        
+                        msg_content = f'> ||{message.content}||'
+                    else:
+                        msg_content = f'> {message.content}'
+
                     attachment = await attachment[0].to_file()
 
                     author = message.author
                     embed = discord.Embed(
-                        title="Meme",
+                        title="Elite Meme",
                         description=str(message.content),
                         color=discord.Color.gold(),
                     )
@@ -782,8 +791,8 @@ async def on_raw_reaction_add(payload):
                         embed=embed, file=attachment
                     )
                     query = "UPDATE Messages SET in_showcase = :in_showcase WHERE message_id = :message_id;"
-                    values = {"in_showcase": showcased_meme.id, 
-                             'message_id': payload.message_id}
+                    values = {"in_showcase": showcased_meme.id,
+                              'message_id': payload.message_id}
                     await db.execute(query, values)
                     await db.commit()
                 elif num_thumbs_up >= showcaselikes and int(result[0][5]) != 0:
@@ -793,7 +802,7 @@ async def on_raw_reaction_add(payload):
 
                     author = message.author
                     embed = discord.Embed(
-                        title="Meme",
+                        title="Elite Meme",
                         description=str(message.content),
                         color=discord.Color.gold(),
                     )
@@ -817,7 +826,215 @@ async def on_raw_reaction_add(payload):
                              'dislikes = :dislikes,'
                              'reuploadreactions = :reuploadreactions '
                              'WHERE message_id = :message_id;')
-                    
+
+                    values = {
+                        "likes": num_thumbs_up,
+                        "dislikes": num_thumbs_down,
+                        "reuploadreactions": num_reupload,
+                        "message_id": payload.message_id
+                    }
+
+                    await db.execute(query, values)
+                    await db.commit()
+
+            except (IndexError, TypeError):
+                pass
+
+            try:
+                deletedislikes = result[0][5]
+                query = (
+                    "UPDATE Messages SET likes = :likes, dislikes = :dislikes, reuploadreactions = :reuploadreactions"
+                    " WHERE message_id = :message_id;"
+                )
+                values = {
+                    "dislikes": num_thumbs_down,
+                    "likes": num_thumbs_up,
+                    "reuploadreactions": num_reupload,
+                    "message_id": payload.message_id,
+                }
+
+                await db.execute(query, values)
+                await db.commit()
+            except (IndexError, TypeError):
+                pass
+
+            try:
+                query = "SELECT deleteDislikes FROM serverSettings where guild_id = :guild_id;"
+                values = {"guild_id": payload.guild_id}
+                result = await db.execute_fetchall(query, values)
+                if num_thumbs_down >= result[0][0]:
+                    await message.delete()
+                    query = "DELETE FROM Messages WHERE message_id = :message_id;"
+                    values = {"message_id": payload.message_id}
+                    await db.execute(query, values)
+                    await db.commit()
+                    return
+            except (IndexError, TypeError):
+                pass
+
+            try:
+                query = "SELECT reuploadReactions FROM serverSettings where guild_id = :guild_id;"
+                values = {"guild_id": payload.guild_id}
+                result = await db.execute_fetchall(query, values)
+                if num_reupload >= result[0][0]:
+                    await message.delete()
+                    query = "DELETE FROM Messages WHERE message_id = :message_id;"
+                    values = {"message_id": payload.message_id}
+                    await db.execute(query, values)
+                    await db.commit()
+                    return
+            except (IndexError, TypeError):
+                pass
+
+            await db.close()
+            return
+    else:
+        return
+
+@bot.event
+async def on_raw_reaction_remove(payload):
+    if payload.user_id != bot.user.id:
+
+        db_path = "/data/memevotebot.sqlite"
+        db = await aiosqlite.connect(db_path)
+
+        query = "SELECT * FROM ServerSettings WHERE guild_id = :guild_id;"
+        values = {"guild_id": payload.guild_id}
+        try:
+            result = await db.execute_fetchall(query, values)
+            memechannels = result[0][1]
+        except IndexError:
+            return
+        if isinstance(memechannels, int) and payload.channel_id != memechannels:
+            return
+        elif isinstance(memechannels, list) and payload.channel_id not in memechannels:
+            return
+
+        if payload.emoji.name in ["👍", "👎", "♻️"]:
+            channel = bot.get_channel(payload.channel_id)
+            message = await channel.fetch_message(payload.message_id)
+
+            msg_entry = None
+
+            num_thumbs_up = 0
+            num_thumbs_down = 0
+            num_reupload = 0
+
+            # Iterate over each reaction in the message
+            for reaction in message.reactions:
+                # Check if the reaction's emoji matches the ones you're interested in
+                if str(reaction.emoji) == "👍":
+                    # Delete the reaction if it is by the author of the post
+                    user = await bot.fetch_user(payload.user_id)
+                    post = await channel.fetch_message(payload.message_id)
+                    if user.id == post.author.id:
+                        await reaction.remove(user)
+                    else:
+                        num_thumbs_up = reaction.count
+                elif str(reaction.emoji) == "👎":
+                    num_thumbs_down = reaction.count
+                elif str(reaction.emoji) == "♻️":
+                    num_reupload = reaction.count
+
+            try:
+                query = "SELECT * FROM Messages WHERE message_id = :message_id;"
+                values = {"message_id": payload.message_id}
+                result = await db.execute_fetchall(query, values)
+            except IndexError:  # is thrown if the message is not in the database
+                query = (
+                    "INSERT INTO Messages VALUES (:message_id, :guild_id, :thumbs_up,"
+                    " :thumbs_down, :reupload, :in_showcase);"
+                )
+                values = {
+                    "message_id": payload.message_id,
+                    "thumbs_up": num_thumbs_up,
+                    "thumbs_down": num_thumbs_down,
+                    "reupload": num_reupload,
+                    "in_showcase": 0,
+                }
+                await db.execute(query=query, values=values)
+                await db.commit()
+
+            try:
+                query = "SELECT * FROM serverSettings WHERE guild_id = :guild_id;"
+                values = {"guild_id": payload.guild_id}
+                settings = await db.execute_fetchall(query, values)
+                showcaselikes = settings[0][4]
+                showcasechannel_id = settings[0][2]
+
+                if num_thumbs_up >= showcaselikes and int(result[0][5]) == 0:
+                    showcasechannel = await bot.fetch_channel(showcasechannel_id)
+                    attachment = message.attachments
+                    channel = await bot.fetch_channel(payload.channel_id)
+
+                    # Download the attachment
+                    if "offensive" in channel.name:
+                        attachment[0].filename = f'SPOILER_{attachment[0].filename}'
+                        msg_content = f'> ||{message.content}||'
+                    else:
+                        msg_content = f'> {message.content}'
+
+                    attachment = await attachment[0].to_file()
+
+                    author = message.author
+                    embed = discord.Embed(
+                        title="Elite Meme",
+                        description=str(message.content),
+                        color=discord.Color.gold(),
+                    )
+                    embed.set_author(
+                        name=str(author.name), icon_url=str(message.author.avatar.url)
+                    )
+                    embed.add_field(name="Channel", value=str(message.channel.mention))
+                    embed.add_field(name="Likes", value=f"{num_thumbs_up} 👍")
+                    embed.add_field(name="Link to message", value=str(message.jump_url))
+                    utc_timezone = pytz.utc
+                    utc_created_at = message.created_at.astimezone(utc_timezone)
+                    embed.set_footer(
+                        text=f"Sent at {utc_created_at.strftime('%m/%d/%Y %I:%M %p')} (UTC)"
+                    )
+
+                    # Send a new message with the attachment
+                    showcased_meme = await showcasechannel.send(
+                        embed=embed, file=attachment
+                    )
+                    query = "UPDATE Messages SET in_showcase = :in_showcase WHERE message_id = :message_id;"
+                    values = {"in_showcase": showcased_meme.id,
+                              'message_id': payload.message_id}
+                    await db.execute(query, values)
+                    await db.commit()
+                elif num_thumbs_up >= showcaselikes and int(result[0][5]) != 0:
+                    channel = bot.get_channel(int(showcasechannel_id))
+                    showcase_message = await channel.fetch_message(int(result[0][5]))
+                    file = await message.attachments[0].to_file()
+
+                    author = message.author
+                    embed = discord.Embed(
+                        title="Elite Meme",
+                        description=str(message.content),
+                        color=discord.Color.gold(),
+                    )
+                    embed.set_author(
+                        name=str(author.name), icon_url=str(message.author.avatar.url)
+                    )
+                    embed.add_field(name="Channel", value=str(message.channel.mention))
+                    embed.add_field(name="Likes", value=f"{num_thumbs_up} 👍")
+                    embed.add_field(name="Link to message", value=str(message.jump_url))
+                    utc_timezone = pytz.utc
+                    utc_created_at = message.created_at.astimezone(utc_timezone)
+                    embed.set_footer(
+                        text=f"Sent at {utc_created_at.strftime('%m/%d/%Y %I:%M %p')} (UTC)"
+                    )
+
+                    await showcase_message.edit(embed=embed)
+
+                else:
+                    query = ('UPDATE Messages '
+                             'SET likes = :likes, '
+                             'dislikes = :dislikes,'
+                             'reuploadreactions = :reuploadreactions '
+                             'WHERE message_id = :message_id;')
+
                     values = {
                         "likes": num_thumbs_up,
                         "dislikes": num_thumbs_down,
@@ -886,9 +1103,20 @@ async def on_raw_reaction_add(payload):
 @bot.event
 async def on_raw_message_delete(payload):
     try:
-
         db_path = "/data/memevotebot.sqlite"
         db = await aiosqlite.connect(db_path)
+
+        query = "SELECT * FROM Messages WHERE message_id = :message_id;"
+        settings_query = "SELECT * FROM ServerSettings WHERE guild_id = :guild_id;"
+        values = {"message_id": payload.message_id, "guild_id": payload.guild_id}
+        settings_result = await db.execute_fetchall(query, values)
+        values = {"message_id": payload.message_id}
+        result = await db.execute_fetchall(query, values)
+        if result[0][5] != 0:
+            # Delete showcase message
+            channel = bot.get_channel(int(settings_result[0][2]))
+            showcase_message = await channel.fetch_message(int(result[0][5]))
+            await showcase_message.delete()
 
         query = "DELETE FROM Messages WHERE message_id = :message_id;"
         values = {"message_id": payload.message_id}
