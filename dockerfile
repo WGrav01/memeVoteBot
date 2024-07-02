@@ -1,5 +1,5 @@
 # Use a PyPy base image
-FROM pypy:3.10-bookworm
+FROM pypy:3.10
 
 # Set the working directory
 WORKDIR /usr/src/app
