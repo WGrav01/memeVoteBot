@@ -1,5 +1,5 @@
 # Use a PyPy base image
-FROM pypy:3.10
+FROM pypy:3.10-slim-bullseye
 
 # Set the working directory
 WORKDIR /usr/src/app
