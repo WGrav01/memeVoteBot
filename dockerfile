@@ -10,6 +10,9 @@ COPY . .
 # Set up the token
 ARG TOKEN
 
+# Potential pip fix
+RUN pip config --user set global.progress_bar off
+
 # Install Pycord and other dependencies
 RUN pip install -r requirements.txt
 
