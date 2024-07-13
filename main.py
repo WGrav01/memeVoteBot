@@ -86,6 +86,7 @@ async def addMemeChannel(ctx, channel: discord.abc.GuildChannel):
                             color=discord.Color.red(),
                         )
                         await ctx.respond(embed=error, ephemeral=True)
+                        await db.close()
                         return
                     meme_channels.append(channel.id)
                 else:
@@ -96,6 +97,7 @@ async def addMemeChannel(ctx, channel: discord.abc.GuildChannel):
                             color=discord.Color.red(),
                         )
                         await ctx.respond(embed=error, ephemeral=True)
+                        await db.close()
                         return
                     meme_channels = [meme_channels, channel.id]
                 values = {"guild_id": ctx.guild.id, "memeChannels": str(meme_channels)}
@@ -144,6 +146,7 @@ async def removeMemeChannel(ctx, channel: discord.abc.GuildChannel):
                     color=discord.Color.red(),
                 )
                 await ctx.respond(embed=error, ephemeral=True)
+                await db.close()
                 return
             if channel.id in channel_result:
                 new_meme_channel = channel_result.remove(channel.id)
@@ -170,6 +173,7 @@ async def removeMemeChannel(ctx, channel: discord.abc.GuildChannel):
                     color=discord.Color.red(),
                 )
                 await ctx.respond(embed=error, ephemeral=True)
+                await db.close()
                 return
         elif isinstance(result[0][1], int):
             channel_result = result[0][1]
@@ -398,6 +402,7 @@ async def removeShowcaseChannel(ctx, channel: discord.abc.GuildChannel):
                     color=discord.Color.red(),
                 )
                 await ctx.respond(embed=error, ephemeral=True)
+                await db.close()
                 return
         except IndexError:
             error = discord.Embed(
@@ -406,6 +411,7 @@ async def removeShowcaseChannel(ctx, channel: discord.abc.GuildChannel):
                 color=discord.Color.red(),
             )
             await ctx.respond(embed=error, ephemeral=True)
+            await db.close()
             return
         else:
             query = "UPDATE ServerSettings SET showcaseChannel = :showcaseChannel WHERE guild_id = :guild_id;"
@@ -633,13 +639,16 @@ async def on_message(message):
         memechannels = ast.literal_eval(result[0][1])
         print(f"{memechannels}, type: {type(memechannels)}")
     except IndexError:
+        await db.close()
         return
 
     if isinstance(memechannels, int):
         if message.channel.id != memechannels:
+            await db.close()
             return
     elif isinstance(memechannels, list):
         if message.channel.id not in memechannels:
+            await db.close()
             return
 
     if message.attachments:
@@ -655,6 +664,7 @@ async def on_message(message):
 
     if not hasmeme:
         await message.delete()
+        await db.close()
         return
     else:
         await message.add_reaction("👍")
@@ -889,6 +899,7 @@ async def on_raw_reaction_add(payload):
             await db.close()
             return
     else:
+        await db.close()
         return
 
 @bot.event
@@ -1097,6 +1108,7 @@ async def on_raw_reaction_remove(payload):
             await db.close()
             return
     else:
+        await db.close()
         return
 
 
@@ -1125,6 +1137,7 @@ async def on_raw_message_delete(payload):
         await db.close()
         return
     except KeyError:
+        await db.close()
         return
 
 
