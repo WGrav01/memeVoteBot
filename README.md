@@ -15,4 +15,4 @@ Run as a docker container (docker pull ghcr.io/wgrav01/memevotebot:nightly) with
 - Not actively maintained, (as It Just Works™) but open a PR and I may merge it.
 - Apologies for the messy source code, if you are willing to clean it up open a PR!
 
--# Made with ❤️ by WGrav
+> Made with ❤️ by WGrav
