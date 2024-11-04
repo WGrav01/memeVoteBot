@@ -659,8 +659,13 @@ async def on_message(message):
                 hasmeme = True
 
         # Check if the message content contains a link to an image or video
-        if "https://media.discordapp.net" in message.content:
-            hasmeme = True
+        from urllib.parse import urlparse
+        urls = [word for word in message.content.split() if word.startswith("http")]
+        for url in urls:
+            parsed_url = urlparse(url)
+            if parsed_url.hostname == "media.discordapp.net":
+                hasmeme = True
+                break
 
     if not hasmeme:
         await message.delete()
