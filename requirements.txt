@@ -15,4 +15,5 @@ py-cord
 python-dotenv
 pytz
 typing_extensions
+urlparse
 yarl
