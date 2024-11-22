@@ -1125,11 +1125,15 @@ async def on_raw_message_delete(payload):
         settings_result = await db.execute_fetchall(query, values)
         values = {"message_id": payload.message_id}
         result = await db.execute_fetchall(query, values)
-        if result[0][5] != 0:
-            # Delete showcase message
-            channel = bot.get_channel(int(settings_result[0][2]))
-            showcase_message = await channel.fetch_message(int(result[0][5]))
-            await showcase_message.delete()
+        try:
+            if result[0][5] != 0:
+                # Delete showcase message
+                channel = bot.get_channel(int(settings_result[0][2]))
+                showcase_message = await channel.fetch_message(int(result[0][5]))
+                await showcase_message.delete()
+        except IndexError:
+            # The option may or may not be filled, so suppress any errors that occur
+            pass
 
         query = "DELETE FROM Messages WHERE message_id = :message_id;"
         values = {"message_id": payload.message_id}
