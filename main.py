@@ -1112,9 +1112,6 @@ async def on_raw_reaction_remove(payload):
 
             await db.close()
             return
-    else:
-        await db.close()
-        return
 
 
 @bot.event
