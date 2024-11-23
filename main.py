@@ -902,9 +902,6 @@ async def on_raw_reaction_add(payload):
 
             await db.close()
             return
-    else:
-        await db.close()
-        return
 
 @bot.event
 async def on_raw_reaction_remove(payload):
@@ -1126,11 +1123,13 @@ async def on_raw_message_delete(payload):
         values = {"message_id": payload.message_id}
         result = await db.execute_fetchall(query, values)
         try:
-            if result[0][5] != 0:
+            if result[0][5] != 0 and result[0][5] is not None:
                 # Delete showcase message
                 channel = bot.get_channel(int(settings_result[0][2]))
-                showcase_message = await channel.fetch_message(int(result[0][5]))
-                await showcase_message.delete()
+                if channel is not None:
+                    showcase_message = await channel.fetch_message(int(result[0][5]))
+                    if showcase_message is not None:
+                        await showcase_message.delete()
         except IndexError:
             # The option may or may not be filled, so suppress any errors that occur
             pass
