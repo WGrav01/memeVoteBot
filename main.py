@@ -653,12 +653,13 @@ async def on_message(message):
     if message.attachments:
         for attachment in message.attachments:
             if attachment.content_type.startswith(
-                    "image"
+                "image"
             ) or attachment.content_type.startswith("video"):
                 hasmeme = True
 
         # Check if the message content contains a link to an image or video
         from urllib.parse import urlparse
+
         urls = [word for word in message.content.split() if word.startswith("http")]
         for url in urls:
             parsed_url = urlparse(url)
@@ -775,10 +776,10 @@ async def on_raw_reaction_add(payload):
 
                     # Download the attachment
                     if "offensive" in channel.name:
-                        attachment[0].filename = f'SPOILER_{attachment[0].filename}'
-                        msg_content = f'> ||{message.content}||'
+                        attachment[0].filename = f"SPOILER_{attachment[0].filename}"
+                        msg_content = f"> ||{message.content}||"
                     else:
-                        msg_content = f'> {message.content}'
+                        msg_content = f"> {message.content}"
 
                     attachment = await attachment[0].to_file()
 
@@ -805,8 +806,10 @@ async def on_raw_reaction_add(payload):
                         embed=embed, file=attachment
                     )
                     query = "UPDATE Messages SET in_showcase = :in_showcase WHERE message_id = :message_id;"
-                    values = {"in_showcase": showcased_meme.id,
-                              'message_id': payload.message_id}
+                    values = {
+                        "in_showcase": showcased_meme.id,
+                        "message_id": payload.message_id,
+                    }
                     await db.execute(query, values)
                     await db.commit()
                 elif num_thumbs_up >= showcaselikes and int(result[0][5]) != 0:
@@ -835,17 +838,19 @@ async def on_raw_reaction_add(payload):
                     await showcase_message.edit(embed=embed)
 
                 else:
-                    query = ('UPDATE Messages '
-                             'SET likes = :likes, '
-                             'dislikes = :dislikes,'
-                             'reuploadreactions = :reuploadreactions '
-                             'WHERE message_id = :message_id;')
+                    query = (
+                        "UPDATE Messages "
+                        "SET likes = :likes, "
+                        "dislikes = :dislikes,"
+                        "reuploadreactions = :reuploadreactions "
+                        "WHERE message_id = :message_id;"
+                    )
 
                     values = {
                         "likes": num_thumbs_up,
                         "dislikes": num_thumbs_down,
                         "reuploadreactions": num_reupload,
-                        "message_id": payload.message_id
+                        "message_id": payload.message_id,
                     }
 
                     await db.execute(query, values)
@@ -902,6 +907,7 @@ async def on_raw_reaction_add(payload):
 
             await db.close()
             return
+
 
 @bot.event
 async def on_raw_reaction_remove(payload):
@@ -981,10 +987,10 @@ async def on_raw_reaction_remove(payload):
 
                     # Download the attachment
                     if "offensive" in channel.name:
-                        attachment[0].filename = f'SPOILER_{attachment[0].filename}'
-                        msg_content = f'> ||{message.content}||'
+                        attachment[0].filename = f"SPOILER_{attachment[0].filename}"
+                        msg_content = f"> ||{message.content}||"
                     else:
-                        msg_content = f'> {message.content}'
+                        msg_content = f"> {message.content}"
 
                     attachment = await attachment[0].to_file()
 
@@ -1011,8 +1017,10 @@ async def on_raw_reaction_remove(payload):
                         embed=embed, file=attachment
                     )
                     query = "UPDATE Messages SET in_showcase = :in_showcase WHERE message_id = :message_id;"
-                    values = {"in_showcase": showcased_meme.id,
-                              'message_id': payload.message_id}
+                    values = {
+                        "in_showcase": showcased_meme.id,
+                        "message_id": payload.message_id,
+                    }
                     await db.execute(query, values)
                     await db.commit()
                 elif num_thumbs_up >= showcaselikes and int(result[0][5]) != 0:
@@ -1041,17 +1049,19 @@ async def on_raw_reaction_remove(payload):
                     await showcase_message.edit(embed=embed)
 
                 else:
-                    query = ('UPDATE Messages '
-                             'SET likes = :likes, '
-                             'dislikes = :dislikes,'
-                             'reuploadreactions = :reuploadreactions '
-                             'WHERE message_id = :message_id;')
+                    query = (
+                        "UPDATE Messages "
+                        "SET likes = :likes, "
+                        "dislikes = :dislikes,"
+                        "reuploadreactions = :reuploadreactions "
+                        "WHERE message_id = :message_id;"
+                    )
 
                     values = {
                         "likes": num_thumbs_up,
                         "dislikes": num_thumbs_down,
                         "reuploadreactions": num_reupload,
-                        "message_id": payload.message_id
+                        "message_id": payload.message_id,
                     }
 
                     await db.execute(query, values)
