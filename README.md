@@ -4,7 +4,7 @@
 - Automatically create a like and dislike reaction system in specified channels
 - Block the original poster from liking their own meme
 - Showcase memes that reach a server-specified threshold of likes
-- Delete memes that reach a server-specified threshold of dislikes or recycle emojis (for reuploaded memes)
+- Delete memes that reach an admin-specified threshold of dislikes or recycle emojis (for reuploaded memes)
 - Automatically update the like counter of showcased memes as they receive new likes
 - Prevent text-only messages from being sent in designated meme channels
 
