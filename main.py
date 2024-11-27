@@ -213,113 +213,106 @@ async def removeMemeChannel(ctx, channel: discord.abc.GuildChannel):
 
 @bot.slash_command(name="view-settings", description="view the guild's settings")
 async def viewSettings(ctx):
-    await ctx.defer(ephemeral=True)
-    if ctx.user.guild_permissions.administrator:
-        try:
-            db_path = "/data/memevotebot.sqlite"
-            db = await aiosqlite.connect(db_path)
+    await ctx.defer(ephemeral=False)
+    try:
+        db_path = "/data/memevotebot.sqlite"
+        db = await aiosqlite.connect(db_path)
 
-            embed = discord.Embed(
-                title="Channels",
-                description="List of channels set for bot use",
-                color=discord.Color.blurple(),
+        embed = discord.Embed(
+            title="Channels",
+            description="List of channels set for bot use",
+            color=discord.Color.blurple(),
+        )
+        formatted_memechannels = None
+        meme_channels = None
+        ch_list = None
+        query = "SELECT * FROM serverSettings WHERE guild_id = :guild_id;"
+        values = {"guild_id": ctx.guild.id}
+        result = await db.execute_fetchall(query, values)
+        await db.close()
+        if result and result[0][1]:
+            meme_channels = result[0][1]
+            if isinstance(meme_channels, str):
+                meme_channels = ast.literal_eval(meme_channels)
+            if isinstance(meme_channels, list):
+                formatted_memechannels = "\n".join(
+                    f"- <#{item}>" for item in meme_channels
+                )
+            else:
+                formatted_memechannels = f"- <#{meme_channels}>"
+        if meme_channels is None:
+            embed.add_field(
+                name="Meme Channels",
+                value="""There are no meme channels set,
+      the bot will not handle memes being posted""",
+                inline=False,
             )
-            formatted_memechannels = None
-            meme_channels = None
-            ch_list = None
-            query = "SELECT * FROM serverSettings WHERE guild_id = :guild_id;"
-            values = {"guild_id": ctx.guild.id}
-            result = await db.execute_fetchall(query, values)
-            await db.close()
-            if result and result[0][1]:
-                meme_channels = result[0][1]
-                if isinstance(meme_channels, str):
-                    meme_channels = ast.literal_eval(meme_channels)
-                if isinstance(meme_channels, list):
-                    formatted_memechannels = "\n".join(
-                        f"- <#{item}>" for item in meme_channels
-                    )
-                else:
-                    formatted_memechannels = f"- <#{meme_channels}>"
-            if meme_channels is None:
-                embed.add_field(
-                    name="Meme Channels",
-                    value="""There are no meme channels set,
-          the bot will not handle memes being posted""",
-                    inline=False,
-                )
-            else:
-                embed.add_field(
-                    name="Meme Channels",
-                    value=str(formatted_memechannels),
-                    inline=False,
-                )
-            showcasechannel = f" - <#{result[0][2]}>"
-            if result[0][2] is None:
-                embed.add_field(
-                    name="Showcase Channel",
-                    value="""There is no showcase channel set,
-           bot will not showcase memes""",
-                )
-            else:
-                embed.add_field(
-                    name="Showcase Channel", value=str(showcasechannel), inline=False
-                )
+        else:
+            embed.add_field(
+                name="Meme Channels",
+                value=str(formatted_memechannels),
+                inline=False,
+            )
+        showcasechannel = f" - <#{result[0][2]}>"
+        if result[0][2] is None:
+            embed.add_field(
+                name="Showcase Channel",
+                value="""There is no showcase channel set,
+       bot will not showcase memes""",
+            )
+        else:
+            embed.add_field(
+                name="Showcase Channel", value=str(showcasechannel), inline=False
+            )
 
-            showcaselikes = result[0][4]
-            if showcaselikes is None:
-                embed.add_field(
-                    name="Showcase Likes",
-                    value="""There are no showcase likes set,
-                          the bot will not showcase any memes.""",
-                    inline=False,
-                )
-            else:
-                embed.add_field(
-                    name="Showcase likes", value=str(showcaselikes), inline=False
-                )
-            deletedislikes = result[0][5]
-            if deletedislikes is None:
-                embed.add_field(
-                    name="Delete Dislikes",
-                    value="""Delete dislikes not set,
-                          bot will not delete disliked posts""",
-                    inline=False,
-                )
-            else:
-                embed.add_field(
-                    name="Delete dislikes", value=str(deletedislikes), inline=False
-                )
-            reuploadreactions = result[0][3]
-            if reuploadreactions is None:
-                embed.add_field(
-                    name="Reupload Reactions",
-                    value="""Reupload reactions not set,
-                          bot will not delete reuploaded posts""",
-                    inline=False,
-                )
-            else:
-                embed.add_field(
-                    name="Reupload Reactions",
-                    value=str(reuploadreactions),
-                    inline=False,
-                )
-            await ctx.respond(embed=embed, ephemeral=True)
-            return
-        except IndexError:
-            error = discord.Embed(
-                title="Error",
-                description="There are no settings set for this server",
-                color=discord.Color.red(),
+        showcaselikes = result[0][4]
+        if showcaselikes is None:
+            embed.add_field(
+                name="Showcase Likes",
+                value="""There are no showcase likes set,
+                      the bot will not showcase any memes.""",
+                inline=False,
             )
-            await ctx.respond(embed=error, ephemeral=True)
-            return
-    else:
+        else:
+            embed.add_field(
+                name="Showcase likes", value=str(showcaselikes), inline=False
+            )
+        deletedislikes = result[0][5]
+        if deletedislikes is None:
+            embed.add_field(
+                name="Delete Dislikes",
+                value="""Delete dislikes not set,
+                      bot will not delete disliked posts""",
+                inline=False,
+            )
+        else:
+            embed.add_field(
+                name="Delete dislikes", value=str(deletedislikes), inline=False
+            )
+        reuploadreactions = result[0][3]
+        if reuploadreactions is None:
+            embed.add_field(
+                name="Reupload Reactions",
+                value="""Reupload reactions not set,
+                      bot will not delete reuploaded posts""",
+                inline=False,
+            )
+        else:
+            embed.add_field(
+                name="Reupload Reactions",
+                value=str(reuploadreactions),
+                inline=False,
+            )
+        await ctx.respond(embed=embed, ephemeral=True)
+        return
+    except IndexError:
         error = discord.Embed(
             title="Error",
-            description="You do not have permission to use this command",
+            description="There are no settings set for this server",
             color=discord.Color.red(),
         )
+        await ctx.respond(embed=error, ephemeral=True)
+        return
         await ctx.respond(embed=error, ephemeral=True)
         return
 
