@@ -608,7 +608,7 @@ async def setDeleteReuploads(ctx, dislikes: int):
 
 @bot.slash_command(name="ping", description="get latency for the bot")
 async def ping(ctx):
-    await ctx.defer(ephemeral=True)
+    await ctx.defer(ephemeral=False)
     ping = round(bot.latency * 1000)
     color = None
     if ping <= 50:
@@ -620,7 +620,7 @@ async def ping(ctx):
     elif ping <= 1000:
         color = discord.Color.red()
     pong = discord.Embed(title="Pong!", description=f"{ping}ms", color=color)
-    await ctx.respond(embed=pong, ephemeral=True)
+    await ctx.respond(embed=pong, ephemeral=False)
 
 
 @bot.event
