@@ -2,6 +2,11 @@
 
 [![CodeQL Advanced](https://github.com/WGrav01/memeVoteBot/actions/workflows/codeql.yml/badge.svg)](https://github.com/WGrav01/memeVoteBot/actions/workflows/codeql.yml) [![Bandit](https://github.com/WGrav01/memeVoteBot/actions/workflows/bandit.yml/badge.svg)](https://github.com/WGrav01/memeVoteBot/actions/workflows/bandit.yml) [![Docker](https://badgen.net/badge/icon/docker?icon=docker&label)](https://github.com/wgrav01/memeVoteBot/pkgs/container/memevotebot) [![Docker](https://github.com/WGrav01/memeVoteBot/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/WGrav01/memeVoteBot/actions/workflows/docker-publish.yml) [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
+## Note:
+**You are on the organization branch of the repo. This is a major refactor of the bot's code, and is in progress. Most likely, the bot won't even run. Proceed with caution, and feel free to open a PR if you would like to help out.**
+
+This will be released as v2.0.0 once ready.
+
 ## Features
 - Automatically create a like and dislike reaction system in specified channels
 - Block the original poster from liking their own meme
