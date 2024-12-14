@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from src import Bot
 
-bot = bot()
+bot = Bot()
 
 @bot.group()
 async def about():
