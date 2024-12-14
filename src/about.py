@@ -10,7 +10,7 @@ async def about():
     pass
 
 
-@about.slash_command(name="ping", description="get latency for the bot")
+@about.slash_command(name="ping", description="Get latency information for the bot")
 async def ping(ctx):
     await ctx.defer(ephemeral=False)
     ping = round(bot.latency * 1000)
@@ -27,7 +27,7 @@ async def ping(ctx):
     await ctx.respond(embed=pong, ephemeral=False)
 
 
-@about.slash_command(name="github", description="get the link to the bot's github")
+@about.slash_command(name="github", description="Get the link to memeVoteBot's github")
 async def github(ctx):
     await ctx.defer(ephemeral=False)
     github = "https://github.com/WGrav01/memeVoteBot"
@@ -36,4 +36,14 @@ async def github(ctx):
         name="About",
         value="Made with love by wgrav, open source under the AGPLv3 license.",
     )
+    await ctx.respond(embed=response, ephemeral=False)
+
+
+@about.slash_command(
+    name="Version",
+    description="Get the version of memeVoteBot this instance is running",
+)
+async def version(ctx):
+    await ctx.defer(ephemeral=False)
+    response = discord.Embed(title="memeVoteBot Version", description=f"Running v2.0.0")
     await ctx.respond(embed=response, ephemeral=False)
