@@ -34,4 +34,3 @@ class Bot(discord.AutoShardedBot(intents=intents)):
         await db.close()
         change_status.start()
         print(f"Logged in successfully as {bot.user}")
-
