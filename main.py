@@ -615,6 +615,14 @@ async def ping(ctx):
     pong = discord.Embed(title="Pong!", description=f"{ping}ms", color=color)
     await ctx.respond(embed=pong, ephemeral=False)
 
+@bot.slash_command(name="github", description="get the link to the bot's github")
+async def github(ctx):
+    await ctx.defer(ephemeral=False)
+    github = "https://github.com/WGrav01/memeVoteBot"
+    response = discord.Embed(title="memeVoteBot's Github", description=f"{github}")
+    about = response.add_field(name="About", value="Made with love by wgrav, open source under the AGPLv3 license.")
+    await ctx.respond(embed=response, ephemeral=False)
+
 
 @bot.event
 async def on_message(message):
