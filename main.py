@@ -776,7 +776,7 @@ async def on_raw_reaction_add(payload):
                     channel = await bot.fetch_channel(payload.channel_id)
 
                     # Download the attachment
-                    if "offensive" in channel.name:
+                    if "dark-humor" in channel.name:
                         attachment[0].filename = f"SPOILER_{attachment[0].filename}"
                         msg_content = f"> ||{message.content}||"
                     else:
